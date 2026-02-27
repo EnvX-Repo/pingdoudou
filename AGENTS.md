@@ -9,7 +9,6 @@ Perler Beads Pattern Generator (拼豆图纸生成器) - A Next.js application t
 - **Framework**: Next.js 15 + React 19 + TypeScript 5
 - **Styling**: Tailwind CSS 4
 - **Image Processing**: Browser Canvas API
-- **PWA**: Serwist for service worker
 - **Package Manager**: npm
 
 ## Build Commands
@@ -35,13 +34,33 @@ npm run lint
 ```
 src/
 ├── app/                    # Next.js App Router
-│   ├── api/               # API routes (image generation, proxy)
+│   ├── api/               # API routes
+│   │   ├── check-config/  # Configuration check endpoint
+│   │   ├── expand-subject/# Subject expansion
+│   │   ├── generate-image/# AI image generation
+│   │   └── search-reference-image/ # Reference image search
 │   ├── consume-beads/     # Main feature page
 │   ├── focus/             # Focus mode for crafting
-│   └── colorSystemMapping.json  # Color palette data
+│   ├── colorSystemMapping.json  # Color palette data
+│   ├── globals.css        # Global styles
+│   ├── layout.tsx         # Root layout
+│   └── page.tsx           # Entry page (redirects to /consume-beads)
 ├── components/            # React components
 │   ├── ConsumeBeads/     # Feature-specific components
-│   └── *.tsx             # Shared components
+│   │   └── ColorPaletteSelector.tsx
+│   ├── CelebrationAnimation.tsx
+│   ├── ColorPanel.tsx
+│   ├── ColorStatusBar.tsx
+│   ├── CompletionCard.tsx
+│   ├── DownloadSettingsModal.tsx
+│   ├── FloatingColorPalette.tsx
+│   ├── FloatingToolbar.tsx
+│   ├── FocusCanvas.tsx
+│   ├── PatternEditor.tsx
+│   ├── PixelatedPreviewCanvas.tsx
+│   ├── ProgressBar.tsx
+│   ├── SettingsPanel.tsx
+│   └── ToolBar.tsx
 ├── hooks/                 # Custom React hooks
 ├── types/                 # TypeScript type definitions
 └── utils/                 # Utility functions
@@ -263,9 +282,6 @@ GOOGLE_API_KEY=your_key        # Gemini
 OPENAI_API_KEY=your_key        # DALL-E
 AZURE_OPENAI_API_KEY=your_key  # Azure OpenAI
 STABLE_DIFFUSION_API_KEY=your_key
-
-# Proxy (optional)
-HTTPS_PROXY=http://host:port
 ```
 
 ## Common Tasks
@@ -291,6 +307,4 @@ HTTPS_PROXY=http://host:port
 ## Important Notes
 
 - The main entry page (`src/app/page.tsx`) redirects to `/consume-beads`
-- Original homepage logic is preserved in `OriginalHomePage` function
-- PWA is disabled in development, enabled in production
 - Use `console.log` for debugging (removed in production build)
