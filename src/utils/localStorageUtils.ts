@@ -57,8 +57,6 @@ export function presetKeysToHexSelections(
   const selections: PaletteSelections = {};
   const processedHexValues = new Set<string>();
   
-  console.log(`presetKeysToHexSelections: 输入调色板大小 ${allBeadPalette.length}, 预设键数量 ${presetKeys.length}`);
-  
   allBeadPalette.forEach(color => {
     const normalizedHex = color.hex.toUpperCase();
     
@@ -72,8 +70,6 @@ export function presetKeysToHexSelections(
     selections[normalizedHex] = presetKeySet.has(color.key);
   });
   
-  const selectedCount = Object.values(selections).filter(Boolean).length;
-  console.log(`presetKeysToHexSelections: 生成选择对象，总数 ${Object.keys(selections).length}, 选中 ${selectedCount}`);
-  
+
   return selections;
 } 

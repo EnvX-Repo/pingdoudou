@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 
 interface ColorInfo {
   color: string;
@@ -23,26 +23,28 @@ const ColorPanel: React.FC<ColorPanelProps> = ({
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState<'progress' | 'name' | 'total'>('progress');
 
-  // 过滤和排序颜色
-  const filteredAndSortedColors = colors
-    .filter(color => 
-      color.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      color.color.toLowerCase().includes(searchTerm.toLowerCase())
-    )
-    .sort((a, b) => {
-      switch (sortBy) {
-        case 'progress':
-          const progressA = (a.completed / a.total) * 100;
-          const progressB = (b.completed / b.total) * 100;
-          return progressA - progressB; // 进度低的在前
-        case 'name':
-          return a.name.localeCompare(b.name);
-        case 'total':
-          return b.total - a.total; // 数量多的在前
-        default:
-          return 0;
-      }
-    });
+  // 过滤和排序颜色（使用 useMemo 缓存）
+  const filteredAndSortedColors = useMemo(() => {
+    return colors
+      .filter(color => 
+        color.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        color.color.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+      .sort((a, b) => {
+        switch (sortBy) {
+          case 'progress':
+            const progressA = (a.completed / a.total) * 100;
+            const progressB = (b.completed / b.total) * 100;
+            return progressA - progressB; // 进度低的在前
+          case 'name':
+            return a.name.localeCompare(b.name);
+          case 'total':
+            return b.total - a.total; // 数量多的在前
+          default:
+            return 0;
+        }
+      });
+  }, [colors, searchTerm, sortBy]);
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-end">

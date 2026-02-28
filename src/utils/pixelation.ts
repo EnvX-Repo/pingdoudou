@@ -45,7 +45,7 @@ export function colorDistance(rgb1: RgbColor, rgb2: RgbColor): number {
   const dr = rgb1.r - rgb2.r;
   const dg = rgb1.g - rgb2.g;
   const db = rgb1.b - rgb2.b;
-  return Math.sqrt(dr * dr + dg * dg + db * db);
+  return dr * dr + dg * dg + db * db;  // 移除 Math.sqrt，因为只需比较距离大小
 }
 
 // 查找最接近的颜色
@@ -71,7 +71,7 @@ export function findClosestPaletteColor(
   if (blackColor && (targetLuma < 60 || targetSum < 180)) {
     const blackDistance = colorDistance(targetRgb, blackColor.rgb);
     // 如果距离不太远（在合理范围内），优先用黑色
-    if (blackDistance < 150) {
+    if (blackDistance < 22500) {  // 150² = 22500
       return blackColor;
     }
   }
@@ -80,7 +80,7 @@ export function findClosestPaletteColor(
   if (whiteColor && (targetLuma > 200 || targetSum > 600)) {
     const whiteDistance = colorDistance(targetRgb, whiteColor.rgb);
     // 如果距离不太远（在合理范围内），优先用白色
-    if (whiteDistance < 150) {
+    if (whiteDistance < 22500) {  // 150² = 22500
       return whiteColor;
     }
   }
@@ -196,7 +196,6 @@ export function calculatePixelGrid(
     mode: PixelationMode,
     t1FallbackColor: PaletteColor // 传入备用色
 ): MappedPixel[][] {
-    console.log(`Calculating pixel grid with mode: ${mode}`);
     const mappedData: MappedPixel[][] = Array(M).fill(null).map(() => Array(N).fill({ key: t1FallbackColor.key, color: t1FallbackColor.hex }));
     const cellWidthOriginal = imgWidth / N;
     const cellHeightOriginal = imgHeight / M;
@@ -242,6 +241,6 @@ export function calculatePixelGrid(
             mappedData[j][i] = finalCellColorData;
         }
     }
-    console.log(`Pixel grid calculation complete for mode: ${mode}`);
     return mappedData;
+
 } 

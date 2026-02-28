@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useCallback, useState } from 'react';
+import React, { useRef, useEffect, useCallback, useState, useMemo } from 'react';
 import { MappedPixel } from '../utils/pixelation';
 
 interface FocusCanvasProps {
@@ -42,6 +42,12 @@ const FocusCanvas: React.FC<FocusCanvasProps> = ({
 
   // 计算格子大小
   const cellSize = Math.max(15, Math.min(40, 300 / Math.max(gridDimensions.N, gridDimensions.M)));
+
+  // 创建 Set 用于快速查找推荐区域 - O(1) 而非 .some() 的 O(n)
+  const recommendedRegionSet = useMemo(() => {
+    if (!recommendedRegion) return new Set<string>();
+    return new Set(recommendedRegion.map(cell => `${cell.row},${cell.col}`));
+  }, [recommendedRegion]);
 
   // 渲染画布
   const renderCanvas = useCallback(() => {
@@ -105,9 +111,7 @@ const FocusCanvas: React.FC<FocusCanvasProps> = ({
         }
 
         // 如果是推荐区域的一部分，添加高亮边框
-        const isInRecommendedRegion = recommendedRegion?.some(cell => 
-          cell.row === row && cell.col === col
-        );
+        const isInRecommendedRegion = recommendedRegionSet.has(cellKey);
         if (isInRecommendedRegion) {
           ctx.strokeStyle = '#ff4444';
           ctx.lineWidth = 3;
@@ -154,7 +158,7 @@ const FocusCanvas: React.FC<FocusCanvasProps> = ({
         ctx.stroke();
       }
     }
-  }, [mappedPixelData, gridDimensions, cellSize, currentColor, completedCells, recommendedCell, recommendedRegion, gridSectionInterval, showSectionLines, sectionLineColor]);
+  }, [mappedPixelData, gridDimensions, cellSize, currentColor, completedCells, recommendedCell, recommendedRegionSet, gridSectionInterval, showSectionLines, sectionLineColor]);
 
   // 处理触摸/鼠标事件
   const getEventPosition = useCallback((event: React.MouseEvent | React.TouchEvent) => {

@@ -299,14 +299,7 @@ const PatternEditor: React.FC<PatternEditorProps> = ({
     isClick: boolean,
     isTouchEnd?: boolean
   ) => {
-    console.log('handleCanvasInteraction called:', { clientX, clientY, isClick, isManualColoringMode });
-    
     if (!canvasRef.current || !mappedPixelData || !pattern.gridDimensions) {
-      console.log('Canvas interaction skipped: missing refs or data', {
-        hasCanvasRef: !!canvasRef.current,
-        hasMappedData: !!mappedPixelData,
-        hasGridDimensions: !!pattern.gridDimensions
-      });
       return;
     }
     
@@ -330,41 +323,19 @@ const PatternEditor: React.FC<PatternEditorProps> = ({
     const col = Math.floor(actualX / cellSize);
     const row = Math.floor(actualY / cellSize);
     
-    console.log('Canvas click calculation:', {
-      clientX, clientY,
-      rect: { left: rect.left, top: rect.top, width: rect.width, height: rect.height },
-      canvasSize: { width: canvas.width, height: canvas.height },
-      scale: { scaleX, scaleY },
-      actualPos: { actualX, actualY },
-      cellSize,
-      gridPos: { row, col }
-    });
-
     if (row < 0 || row >= pattern.gridDimensions.M || col < 0 || col >= pattern.gridDimensions.N) {
-      console.log('Canvas interaction skipped: out of bounds', { row, col, bounds: { M: pattern.gridDimensions.M, N: pattern.gridDimensions.N } });
       return;
     }
 
     const cell = mappedPixelData[row]?.[col];
     if (!cell) {
-      console.log('Canvas interaction skipped: no cell data', { row, col });
       return;
     }
-
-    console.log('Canvas interaction:', { 
-      isClick, 
-      row, 
-      col, 
-      cellKey: cell.key,
-      isEraseMode: editingState.isEraseMode,
-      selectedColor: editingState.selectedColor?.key,
-      colorReplaceState: editingState.colorReplaceState
-    });
 
     // 取色笔模式
     if (editingState.isEyedropperMode && isClick) {
       // 从画布取色
-      console.log('Eyedropper: picking color from canvas:', { key: cell.key, color: cell.color });
+      if (!cell.isExternal && cell.key) {
       if (!cell.isExternal && cell.key) {
         // 获取颜色对应的key
         const colorKey = getColorKeyByHex(cell.color, colorSystem) || cell.key;
@@ -379,7 +350,7 @@ const PatternEditor: React.FC<PatternEditorProps> = ({
     if (editingState.colorReplaceState.isActive) {
       if (editingState.colorReplaceState.step === 'select-source' && isClick) {
         // 从画布选择源颜色
-        console.log('Selecting source color from canvas:', { key: cell.key, color: cell.color });
+        editingState.selectSourceColorFromCanvas({ key: cell.key, color: cell.color });
         editingState.selectSourceColorFromCanvas({ key: cell.key, color: cell.color });
       }
       // 注意：目标颜色选择在调色盘中完成，不需要在画布上点击
@@ -388,7 +359,7 @@ const PatternEditor: React.FC<PatternEditorProps> = ({
 
     // 区域擦除模式
     if (editingState.isEraseMode && isClick) {
-      console.log('Performing flood fill erase:', { row, col, targetKey: cell.key });
+      editingOperations.performFloodFillErase(row, col, cell.key);
       editingOperations.performFloodFillErase(row, col, cell.key);
       return;
     }
@@ -410,27 +381,27 @@ const PatternEditor: React.FC<PatternEditorProps> = ({
       if (editingState.selectedColor) {
         // 如果选择的是橡皮擦
         if (editingState.selectedColor.key === 'ERASE' || editingState.selectedColor.key === TRANSPARENT_KEY) {
-          console.log('Performing erase with selected eraser:', { row, col, targetKey: cell.key });
+          editingOperations.performFloodFillErase(row, col, cell.key);
           editingOperations.performFloodFillErase(row, col, cell.key);
         } else {
           // 正常上色（单点或画笔模式）
           if (editingState.isBrushMode) {
             // 画笔模式：连续绘制
-            console.log('Performing brush paint:', { row, col, newColor: editingState.selectedColor });
+            editingOperations.performSinglePixelPaint(row, col, editingState.selectedColor);
             editingOperations.performSinglePixelPaint(row, col, editingState.selectedColor);
           } else {
             // 单点模式
-            console.log('Performing single pixel paint:', { row, col, newColor: editingState.selectedColor });
+            editingOperations.performSinglePixelPaint(row, col, editingState.selectedColor);
             editingOperations.performSinglePixelPaint(row, col, editingState.selectedColor);
           }
         }
       } else if (editingState.isEraseMode) {
         // 如果没有选择颜色但处于擦除模式，执行区域擦除
-        console.log('Performing erase in erase mode:', { row, col, targetKey: cell.key });
+        editingOperations.performFloodFillErase(row, col, cell.key);
         editingOperations.performFloodFillErase(row, col, cell.key);
       } else {
         // 如果没有选择颜色，提示用户先选择颜色
-        console.log('No color selected, please select a color first');
+      }
       }
       
       // 延迟重置编辑标记，确保自动保存不会立即触发
@@ -748,9 +719,7 @@ const PatternEditor: React.FC<PatternEditorProps> = ({
             colorReplaceState={editingState.colorReplaceState}
             onColorReplaceToggle={editingState.toggleColorReplaceMode}
             onColorReplace={(sourceColor, targetColor) => {
-              console.log('Color replace called:', { sourceColor, targetColor });
               const replaceCount = editingOperations.performColorReplace(sourceColor, targetColor);
-              console.log('Color replace result:', { replaceCount });
               if (replaceCount > 0) {
                 editingState.completeColorReplace();
               } else {

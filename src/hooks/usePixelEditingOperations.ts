@@ -93,7 +93,6 @@ export function usePixelEditingOperations({
       onColorCountsChange(newColorCounts);
       onTotalCountChange(newTotalCount);
 
-      console.log(`颜色替换完成：将 ${replaceCount} 个 ${sourceColor.key} 替换为 ${targetColor.key}`);
     }
 
     return replaceCount;
