@@ -298,7 +298,7 @@ export function mergeSimilarColors(
       const dist = colorDistance(currentRgb, lowerFreqRgb);
 
       // 如果距离小于阈值，将低频颜色替换为高频颜色
-      if (dist < similarityThreshold) {
+      if (dist < similarityThreshold * similarityThreshold) {
         replacedColors.add(lowerFreqKey);
         const mergeCount = initialColorCounts[lowerFreqKey] || 0;
         

@@ -336,7 +336,6 @@ const PatternEditor: React.FC<PatternEditorProps> = ({
     if (editingState.isEyedropperMode && isClick) {
       // 从画布取色
       if (!cell.isExternal && cell.key) {
-      if (!cell.isExternal && cell.key) {
         // 获取颜色对应的key
         const colorKey = getColorKeyByHex(cell.color, colorSystem) || cell.key;
         editingState.selectColor({ key: colorKey, color: cell.color });
@@ -351,7 +350,6 @@ const PatternEditor: React.FC<PatternEditorProps> = ({
       if (editingState.colorReplaceState.step === 'select-source' && isClick) {
         // 从画布选择源颜色
         editingState.selectSourceColorFromCanvas({ key: cell.key, color: cell.color });
-        editingState.selectSourceColorFromCanvas({ key: cell.key, color: cell.color });
       }
       // 注意：目标颜色选择在调色盘中完成，不需要在画布上点击
       return;
@@ -359,7 +357,6 @@ const PatternEditor: React.FC<PatternEditorProps> = ({
 
     // 区域擦除模式
     if (editingState.isEraseMode && isClick) {
-      editingOperations.performFloodFillErase(row, col, cell.key);
       editingOperations.performFloodFillErase(row, col, cell.key);
       return;
     }
@@ -382,26 +379,21 @@ const PatternEditor: React.FC<PatternEditorProps> = ({
         // 如果选择的是橡皮擦
         if (editingState.selectedColor.key === 'ERASE' || editingState.selectedColor.key === TRANSPARENT_KEY) {
           editingOperations.performFloodFillErase(row, col, cell.key);
-          editingOperations.performFloodFillErase(row, col, cell.key);
         } else {
           // 正常上色（单点或画笔模式）
           if (editingState.isBrushMode) {
             // 画笔模式：连续绘制
             editingOperations.performSinglePixelPaint(row, col, editingState.selectedColor);
-            editingOperations.performSinglePixelPaint(row, col, editingState.selectedColor);
           } else {
             // 单点模式
-            editingOperations.performSinglePixelPaint(row, col, editingState.selectedColor);
             editingOperations.performSinglePixelPaint(row, col, editingState.selectedColor);
           }
         }
       } else if (editingState.isEraseMode) {
         // 如果没有选择颜色但处于擦除模式，执行区域擦除
         editingOperations.performFloodFillErase(row, col, cell.key);
-        editingOperations.performFloodFillErase(row, col, cell.key);
       } else {
         // 如果没有选择颜色，提示用户先选择颜色
-      }
       }
       
       // 延迟重置编辑标记，确保自动保存不会立即触发
