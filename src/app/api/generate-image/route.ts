@@ -118,7 +118,7 @@ async function generateWithGoogleGemini(
 
   // Google Gemini图像生成endpoint
   // 支持的模型：gemini-2.5-flash-image (Nano Banana) 或 gemini-3-pro-image-preview (Nano Banana Pro)
-  const model = getEnv('GEMINI_IMAGE_MODEL') || 'gemini-2.5-flash-image';
+  const model = getEnv('GEMINI_IMAGE_MODEL') || 'gemini-3.1-flash-image-preview';
   const baseUrl = getEnv('GOOGLE_API_BASE_URL') || 'https://generativelanguage.googleapis.com/v1beta';
   const endpoint = `${baseUrl.replace(/\/$/, '')}/models/${model}:generateContent?key=${apiKey}`;
 
@@ -332,7 +332,7 @@ async function generateWithOpenRouter(
   // OpenRouter支持的图像生成模型
   // 支持的模型：google/gemini-2.5-flash-image, openai/gpt-5-image-mini, bytedance/seedream-4.5
   // 默认使用性价比高的模型
-  const imageModel = getEnv('OPENROUTER_IMAGE_MODEL') || 'google/gemini-2.5-flash-image';
+  const imageModel = getEnv('OPENROUTER_IMAGE_MODEL') || 'google/gemini-3.1-flash-image-preview';
 
   const response = await fetch(endpoint, {
     method: 'POST',

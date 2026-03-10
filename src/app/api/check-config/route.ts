@@ -6,7 +6,7 @@ export async function GET() {
   const googleApiKey = getEnv('GOOGLE_API_KEY') || getEnv('GEMINI_API_KEY');
   const apiKey = googleApiKey || getEnv('AZURE_OPENAI_API_KEY') || getEnv('OPENAI_API_KEY') || getEnv('STABLE_DIFFUSION_API_KEY');
   const apiService = getEnv('IMAGE_GENERATION_SERVICE') || 'openai';
-  const model = getEnv('GEMINI_IMAGE_MODEL') || 'gemini-2.5-flash-image';
+  const model = getEnv('GEMINI_IMAGE_MODEL') || 'gemini-3.1-flash-image-preview';
   
   // 检测服务类型
   let detectedService = 'none';
